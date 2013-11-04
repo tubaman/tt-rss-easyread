@@ -25,27 +25,27 @@
 	</script>
 
 	<script type="html/categories">
-	<ul class="categories"></ul>
+	<ul class="categories list-group"></ul>
 	</script>
 
 	<script type="html/category">
-	<li><a class="category" href="#category/{id}">{title}</a>({unread})</li>
+	<li class="list-group-item"><span class="badge">{unread}</span><a class="category" href="#category/{id}">{title}</a></li>
 	</script>
 
 	<script type="html/feeds">
-	<ul class="feeds"></ul>
+	<ul class="feeds list-group"></ul>
 	</script>
 
 	<script type="html/feed">
-	<li><a class="feed" href="#feed/{id}">{title}</a>({unread})</li>
+	<li class="list-group-item"><span class="badge">{unread}</span><a class="feed" href="#feed/{id}">{title}</a></li>
 	</script>
 
 	<script type="html/headlines">
-	<ul class="headlines"></ul>
+	<ul class="headlines list-group"></ul>
 	</script>
 
 	<script type="html/headline">
-	<li><a class="headline" href="{link}">{title}</a></li>
+	<li class="list-group-item"><a class="headline" href="{link}">{title}</a></li>
 	</script>
 
 	<body>
