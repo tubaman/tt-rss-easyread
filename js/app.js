@@ -72,8 +72,6 @@
 			content.empty();
 			$.el(loginTemplate).appendTo(content);
 			
-			$("#loginFail").hide();
-
 			$("#login").click(function(e) {
 				e.preventDefault();
 				ttrss.login($("#user").val(), $("#password").val())
