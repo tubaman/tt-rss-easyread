@@ -66,8 +66,10 @@
 	$.route(function(hash) {
 		console.log("hash: " + hash);
 		console.log("hash.slice(1, 'category'.length + 1): " + hash.slice(1, 'category'.length + 1));
+		// Be default we show categories
 		if (hash == "" || hash == "#") {
 			ttrss.getCategories();
+		// login
 		} else if (hash.slice(1, 'login'.length + 1) == 'login') {
 			content.empty();
 			$.el(loginTemplate).appendTo(content);
@@ -84,11 +86,13 @@
 				});
 			});
 
+		// feeds in a category
 		} else if (hash.slice(1, 'category'.length + 1) == 'category') {
 			// show feeds for a category
 			var catId = parseInt(hash.slice('category'.length + 2), 10);
 			console.log("catId: " + catId);
 			ttrss.getFeeds(catId);
+		// headlines in a feed
 		} else if (hash.slice(1, 'feed'.length + 1) == 'feed') {
 			// show headlines for a feed
 			var feedId = parseInt(hash.slice('feed'.length + 2), 10);

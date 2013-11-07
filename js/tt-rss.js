@@ -1,3 +1,12 @@
+/* This is an abstraction around the weird tt-rss API
+ * 
+ * ex:
+ * ttrss = TtRss();
+ * ttrss.login('myuser', 'mypass');
+ * categories = ttrss.getCategories();
+ * feeds = ttrss.getFeeds(categories[0].id);
+ * headlines = ttrss.getHeadlines(feeds[0].id);
+ * */
 function TtRss(url) {
 
 	url = url || '/tt-rss/api/';
