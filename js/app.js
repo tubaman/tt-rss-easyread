@@ -1,105 +1,19 @@
-(function() {
-	'use strict';
+window.App = Ember.Application.create();
 
-	// global: for easy use on the console
-	// example: ttrss.login('admin', 'admin');
-	window.ttrss = new TtRss();
+App.Router.map(function() {
+	this.resource('categories', { path: '/' });
+});
 
-	var content = $("#content"),
-		loginTemplate = $("[type='html/login']").html(),
-		categoriesTemplate = $("[type='html/categories']").html(),
-		categoryTemplate = $("[type='html/category']").html(),
-		feedsTemplate = $("[type='html/feeds']").html(),
-		feedTemplate = $("[type='html/feed']").html(),
-		headlinesTemplate = $("[type='html/headlines']").html(),
-		headlineTemplate = $("[type='html/headline']").html();
+App.CategoriesRoute = Ember.Route.extend({
+	model: function() {
+		return App.TtRss.get('login')('admin', 'songahm').
+		then(function() {
+			return App.TtRss.get('categories').fetch();
+		});
+	}
+});
 
-	// Listen to user events
-	$(".category").click(function(e) {
-		e.preventDefault();
-		$.route($(this).attr("href"));	
-	});
+App.ApplicationController = Ember.Controller.extend({
+	sid: $.cookie('ttrss_api_sid'),
+});
 
-	$(".feed").click(function(e) {
-		e.preventDefault();
-		$.route($(this).attr("href"));	
-	});
-
-	// Listen to model events
-	ttrss.on("error", function(error) {
-		if (error == "NOT_LOGGED_IN") {
-			$.route("#login");	
-		}
-	});
-
-	ttrss.on("getCategories", function(categories) {
-		console.log(categories);
-		content.empty();
-		var categoriesElement = $.el(categoriesTemplate).appendTo(content);
-		$.each(categories, function(i, category) {
-			console.log(category);
-			$.el(categoryTemplate, category).appendTo(categoriesElement);
-		})
-	});
-	
-	ttrss.on("getFeeds", function(feeds) {
-		console.log(feeds);
-		content.empty();
-		var feedsElement = $.el(feedsTemplate).appendTo(content);
-		$.each(feeds, function(i, feed) {
-			console.log(feed);
-			$.el(feedTemplate, feed).appendTo(feedsElement);
-		})
-	});
-	
-	ttrss.on("getHeadlines", function(headlines) {
-		console.log(headlines);
-		content.empty();
-		var headlinesElement = $.el(headlinesTemplate).appendTo(content);
-		$.each(headlines, function(i, headline) {
-			console.log(headline);
-			$.el(headlineTemplate, headline).appendTo(headlinesElement);
-		})
-	});
-	
-	// Routing
-	$.route(function(hash) {
-		console.log("hash: " + hash);
-		console.log("hash.slice(1, 'category'.length + 1): " + hash.slice(1, 'category'.length + 1));
-		// Be default we show categories
-		if (hash == "" || hash == "#") {
-			ttrss.getCategories();
-		// login
-		} else if (hash.slice(1, 'login'.length + 1) == 'login') {
-			content.empty();
-			$.el(loginTemplate).appendTo(content);
-			
-			$("#login").click(function(e) {
-				e.preventDefault();
-				ttrss.login($("#user").val(), $("#password").val())
-				.done(function() {
-				  $("#loginFail").hide();
-					$.route("#");
-				})
-				.fail(function(response) {
-					$("#loginFail").show();
-				});
-			});
-
-		// feeds in a category
-		} else if (hash.slice(1, 'category'.length + 1) == 'category') {
-			// show feeds for a category
-			var catId = parseInt(hash.slice('category'.length + 2), 10);
-			console.log("catId: " + catId);
-			ttrss.getFeeds(catId);
-		// headlines in a feed
-		} else if (hash.slice(1, 'feed'.length + 1) == 'feed') {
-			// show headlines for a feed
-			var feedId = parseInt(hash.slice('feed'.length + 2), 10);
-			console.log("feedId: " + feedId);
-			ttrss.getHeadlines(feedId);
-		}
-		
-	});
-
-})()
