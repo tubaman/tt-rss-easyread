@@ -29,26 +29,31 @@
 	{{#each}}
 		<li class="list-group-item">
 			<span class="badge">{{unread}}</span>
-			<a class="category" href="#category/{{id}}">{{title}}</a>
+			{{#link-to 'feeds' this}}{{title}}{{/link-to}}
 		</li>
 	{{/each}}
 	</ul>
 	</script>
 
-	<script type="html/feeds">
-	<ul class="feeds list-group"></ul>
+	<script type="text/x-handlebars" data-template-name="feeds">
+	<ul class="feeds list-group">
+	{{#each}}
+	<li class="list-group-item">
+		<span class="badge">{{unread}}</span>
+		{{#link-to 'headlines' this}}{{title}}{{/link-to}}
+	</li>
+	{{/each}}
+	</ul>
 	</script>
 
-	<script type="html/feed">
-	<li class="list-group-item"><span class="badge">{unread}</span><a class="feed" href="#feed/{id}">{title}</a></li>
-	</script>
-
-	<script type="html/headlines">
-	<ul class="headlines list-group"></ul>
-	</script>
-
-	<script type="html/headline">
-	<li class="list-group-item"><a class="headline" href="{link}" target="_blank">{title}</a></li>
+	<script type="text/x-handlebars" data-template-name="headlines">
+	<ul class="headlines list-group">
+	{{#each}}
+	<li class="list-group-item">
+		<a class="headline" href="{{link}}" target="_blank">{{title}}</a>
+	</li>
+	{{/each}}
+	</ul>
 	</script>
 
 	<body>
@@ -82,6 +87,7 @@
 		<script src="js/ember.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 		<script src="js/app.js"></script>
+		<script src="js/tt-rss.js"></script>
 	</body>
 </html>
 
