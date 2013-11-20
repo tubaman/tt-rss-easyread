@@ -54,10 +54,10 @@
 
     <script type="text/x-handlebars" data-template-name="categories">
     <ul class="categories list-group">
-    {{#each}}
+    {{#each category in model}}
       <li class="list-group-item">
-        <span class="badge">{{unread}}</span>
-        {{#link-to 'feeds' this}}{{title}}{{/link-to}}
+        <span class="badge">{{category.unread}}</span>
+        {{#linkTo 'feeds' category}}{{category.title}}{{/linkTo}}
       </li>
     {{/each}}
     </ul>
@@ -68,7 +68,7 @@
     {{#each}}
     <li class="list-group-item">
       <span class="badge">{{unread}}</span>
-      {{#link-to 'headlines' this}}{{title}}{{/link-to}}
+      {{#linkTo 'headlines' this}}{{title}}{{/linkTo}}
     </li>
     {{/each}}
     </ul>
