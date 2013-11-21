@@ -15,15 +15,33 @@ App.CategoriesRoute = Ember.Route.extend({
 
 App.FeedsRoute = Ember.Route.extend({
 	model: function(params) {
+		var category = App.Category.create({});
+		category.set("feeds", App.Feeds);
 		App.Feeds.fetch(params.category_id);
-		return App.Feeds;
+		return category;
+	},
+
+	setupController: function(controller, context) {
+		App.Feeds.fetch(context.get("id"));
+		context.set("feeds", App.Feeds);
+		controller.set('model', context);
 	}
+
+
 });
 
 App.HeadlinesRoute = Ember.Route.extend({
 	model: function(params) {
+		var feed = App.Feed.create({});
+		feed.set("headlines", App.Headlines);
 		App.Headlines.fetch(params.feed_id);
-		return App.Headlines;
+		return feed;
+	},
+
+	setupController: function(controller, context) {
+		App.Headlines.fetch(context.get("id"));
+		context.set("headlines", App.Headlines);
+		controller.set('model', context);
 	}
 });
 
@@ -35,11 +53,12 @@ App.Categories = Ember.ArrayProxy.create({
 	fetch: function() {
 		var content = this.get('content');
 		var ttrss = new TtRss();
+		content.clear();
 		ttrss.getCategories().then(function(categories) {
-			content.clear();
 			categories.content.forEach(function(data) {
 				var category = App.Category.create();
 				category.setProperties(data);
+				category.set("feeds", []);
 				content.pushObject(category);
 			});
 		});
@@ -53,11 +72,12 @@ App.Feeds = Ember.ArrayProxy.create({
 	fetch: function(categoryId) {
 		var content = this.get('content');
 		var ttrss = new TtRss();
+		content.clear();
 		ttrss.getFeeds(categoryId).then(function(feeds) {
-			content.clear();
 			feeds.content.forEach(function(data) {
 				var feed = App.Feed.create();
 				feed.setProperties(data);
+				feed.set("headlines", []);
 				content.pushObject(feed);
 			});
 		});
@@ -71,8 +91,8 @@ App.Headlines = Ember.ArrayProxy.create({
 	fetch: function(feedId) {
 		var content = this.get('content');
 		var ttrss = new TtRss();
+		content.clear();
 		ttrss.getHeadlines(feedId).then(function(headlines) {
-			content.clear();
 			headlines.content.forEach(function(data) {
 				var headline = App.Headline.create();
 				headline.setProperties(data);

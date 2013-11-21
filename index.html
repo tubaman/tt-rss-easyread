@@ -57,7 +57,7 @@
     {{#each category in model}}
       <li class="list-group-item">
         <span class="badge">{{category.unread}}</span>
-        {{#linkTo 'feeds' category}}{{category.title}}{{/linkTo}}
+        {{#linkTo "feeds" category}}{{category.title}}{{/linkTo}}
       </li>
     {{/each}}
     </ul>
@@ -65,10 +65,10 @@
 
     <script type="text/x-handlebars" data-template-name="feeds">
     <ul class="feeds list-group">
-    {{#each}}
+    {{#each feed in model.feeds}}
     <li class="list-group-item">
       <span class="badge">{{unread}}</span>
-      {{#linkTo 'headlines' this}}{{title}}{{/linkTo}}
+      {{#linkTo 'headlines' feed}}{{feed.title}}{{/linkTo}}
     </li>
     {{/each}}
     </ul>
@@ -76,9 +76,9 @@
 
     <script type="text/x-handlebars" data-template-name="headlines">
     <ul class="headlines list-group">
-    {{#each}}
+    {{#each headline in model.headlines}}
     <li class="list-group-item">
-      <a class="headline" href="{{link}}" target="_blank">{{title}}</a>
+      <a class="headline" href="{{headline.link}}" target="_blank">{{headline.title}}</a>
     </li>
     {{/each}}
     </ul>
