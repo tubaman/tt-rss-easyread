@@ -15,11 +15,13 @@ App.LoginRoute = Ember.Route.extend({
 
 App.AuthenticatedRoute = Ember.Route.extend({
   actions: {
-    error: function(error) {
+    error: function(error, transition) {
       console.log("error: " + error);
       if (error == 'NOT_LOGGED_IN') {
+        var loginController = this.controllerFor('login');
+        loginController.set('attemptedTransition', transition);
         this.transitionTo('login');
-      }
+      } 
     }
   }
 });
@@ -81,7 +83,13 @@ App.LoginController = Ember.Controller.extend({
       function(sid) {
         console.log('got a sid: ' + sid);
         self.set('sid', sid);
-        self.transitionTo('categories');
+        var attemptedTransition = self.get('attemptedTransition');
+        if (attemptedTransition) {
+          attemptedTransition.retry()
+          self.set('attemptedTransition', null);
+        } else {
+          self.transitionTo('categories');
+        }
       },
       function(error) {
         self.set('errorMessage', "User and password combo don't match");
