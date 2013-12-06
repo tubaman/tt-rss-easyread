@@ -13,29 +13,30 @@ App.LoginRoute = Ember.Route.extend({
   }
 });
 
-App.CategoriesRoute = Ember.Route.extend({
-  model: function() {
-    var self = this;
-    App.Categories.fetch().then(null, function(error) {
-      console.log("fetch error: " + error);
-      self.transitionTo('login');
-    });
-    return App.Categories;
-  },
-
+App.AuthenticatedRoute = Ember.Route.extend({
   actions: {
-    error: function(reason) {
-      console.log("error: " + reason);
+    error: function(error) {
+      console.log("error: " + error);
+      if (error == 'NOT_LOGGED_IN') {
+        this.transitionTo('login');
+      }
     }
   }
 });
 
-App.FeedsRoute = Ember.Route.extend({
+App.CategoriesRoute = App.AuthenticatedRoute.extend({
+  model: function() {
+    return App.Categories.fetch();
+  }
+});
+
+App.FeedsRoute = App.AuthenticatedRoute.extend({
   model: function(params) {
     var category = App.Category.create({});
     category.set("feeds", App.Feeds);
-    App.Feeds.fetch(params.category_id);
-    return category;
+    return App.Feeds.fetch(params.category_id).then(function(response) {
+      return category;
+    });
   },
 
   setupController: function(controller, context) {
@@ -44,15 +45,15 @@ App.FeedsRoute = Ember.Route.extend({
     controller.set('model', context);
   }
 
-
 });
 
-App.HeadlinesRoute = Ember.Route.extend({
+App.HeadlinesRoute = App.AuthenticatedRoute.extend({
   model: function(params) {
     var feed = App.Feed.create({});
     feed.set("headlines", App.Headlines);
-    App.Headlines.fetch(params.feed_id);
-    return feed;
+    return App.Headlines.fetch(params.feed_id).then(function(response) {
+      return feed;
+    });
   },
 
   setupController: function(controller, context) {
@@ -95,7 +96,8 @@ App.Categories = Ember.ArrayProxy.create({
   content: [],
 
   fetch: function() {
-    var content = this.get('content');
+    var self = this
+    var content = self.get('content');
     var ttrss = new TtRss();
     content.clear();
     return ttrss.getCategories().then(function(categories) {
@@ -106,6 +108,7 @@ App.Categories = Ember.ArrayProxy.create({
         category.set("feeds", []);
         content.pushObject(category);
       });
+      return self;
     });
   }
 });

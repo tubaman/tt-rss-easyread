@@ -3,6 +3,10 @@ body {
 }
 
 
+#content {
+  padding-top: 20px;
+}
+
 /*
 #loginFail {
 	display: none;

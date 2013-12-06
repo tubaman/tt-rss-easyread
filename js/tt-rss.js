@@ -60,12 +60,13 @@ function TtRss(url) {
 			data: JSON.stringify(data)
 		})
 		.then(function(data, textStatus, jqXHR) {
-			if (data.content.error) {
-        console.log("api error: " + data.content.error);
-				return Ember.$.Deferred().reject(jqXHR, data, data.content.error).promise();
-			} else {
-				return data;
-			}
+      return Ember.$.Deferred(function(deferred) {
+        if (data.content.error) {
+          console.log("api error: " + data.content.error);
+          return deferred.reject(data.content.error);
+        }
+        return deferred.resolve(data);
+      }).promise();
 		});
 	}
 
