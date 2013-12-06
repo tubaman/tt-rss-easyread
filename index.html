@@ -81,7 +81,7 @@
     <ul class="headlines list-group">
     {{#each headline in model.headlines}}
     <li class="list-group-item">
-      <a class="headline" href="{{headline.link}}" target="_blank">{{headline.title}}</a>
+      <a class="headline" {{bindAttr href="headline.link"}} target="_blank">{{headline.title}}</a>
     </li>
     {{/each}}
     </ul>
