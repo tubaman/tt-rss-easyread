@@ -1,15 +1,32 @@
 window.App = Ember.Application.create();
 
 App.Router.map(function() {
+  this.resource('login', { path: '/login' });
   this.resource('categories', { path: '/' });
   this.resource('feeds', { path: '/category/:category_id' });
   this.resource('headlines', { path: '/feed/:feed_id' });
 });
 
+App.LoginRoute = Ember.Route.extend({
+  setupController: function(controller, context) {
+    controller.reset();
+  }
+});
+
 App.CategoriesRoute = Ember.Route.extend({
   model: function() {
-    App.Categories.fetch();
+    var self = this;
+    App.Categories.fetch().then(null, function(error) {
+      console.log("fetch error: " + error);
+      self.transitionTo('login');
+    });
     return App.Categories;
+  },
+
+  actions: {
+    error: function(reason) {
+      console.log("error: " + reason);
+    }
   }
 });
 
@@ -45,6 +62,33 @@ App.HeadlinesRoute = Ember.Route.extend({
   }
 });
 
+/* controllers */
+App.LoginController = Ember.Controller.extend({
+  reset: function() {
+    this.setProperties({
+      user: '',
+      password: '',
+      errorMessage: '',
+    });
+  },
+
+  login: function() {
+    var self = this;
+    var ttrss = new TtRss();
+    self.set('errorMessage', null);
+    ttrss.login(this.get('user'), this.get('password')).then(
+      function(sid) {
+        console.log('got a sid: ' + sid);
+        self.set('sid', sid);
+        self.transitionTo('categories');
+      },
+      function(error) {
+        self.set('errorMessage', "User and password combo don't match");
+        console.log("error: " + JSON.stringify(error));
+      });
+  }
+});
+
 /* models */
 App.Category = Ember.Object.extend({});
 App.Categories = Ember.ArrayProxy.create({
@@ -54,8 +98,9 @@ App.Categories = Ember.ArrayProxy.create({
     var content = this.get('content');
     var ttrss = new TtRss();
     content.clear();
-    ttrss.getCategories().then(function(categories) {
-      categories.content.forEach(function(data) {
+    return ttrss.getCategories().then(function(categories) {
+      console.log("categories: " + JSON.stringify(categories));
+      categories.forEach(function(data) {
         var category = App.Category.create();
         category.setProperties(data);
         category.set("feeds", []);
@@ -73,8 +118,8 @@ App.Feeds = Ember.ArrayProxy.create({
     var content = this.get('content');
     var ttrss = new TtRss();
     content.clear();
-    ttrss.getFeeds(categoryId).then(function(feeds) {
-      feeds.content.forEach(function(data) {
+    return ttrss.getFeeds(categoryId).then(function(feeds) {
+      feeds.forEach(function(data) {
         var feed = App.Feed.create();
         feed.setProperties(data);
         feed.set("headlines", []);
@@ -92,8 +137,8 @@ App.Headlines = Ember.ArrayProxy.create({
     var content = this.get('content');
     var ttrss = new TtRss();
     content.clear();
-    ttrss.getHeadlines(feedId).then(function(headlines) {
-      headlines.content.forEach(function(data) {
+    return ttrss.getHeadlines(feedId).then(function(headlines) {
+      headlines.forEach(function(data) {
         var headline = App.Headline.create();
         headline.setProperties(data);
         content.pushObject(headline);

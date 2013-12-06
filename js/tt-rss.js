@@ -18,7 +18,7 @@ function TtRss(url) {
 
 	self.login = function(username, password) {
 		return api({op: 'login', user: username, password: password})
-			.done(function(data) {
+			.then(function(data) {
 				sid = data.content.session_id;
 				return sid;
 			});
@@ -26,21 +26,21 @@ function TtRss(url) {
 
 	self.getCategories = function() {
 		return api({op: 'getCategories', enable_nested: 'false'})
-			.done(function(data) {
+			.then(function(data) {
 				return data.content;
 			});
 	}
 
 	self.getFeeds = function(catId) {
 		return api({op: 'getFeeds', cat_id: catId, enable_nested: 'false'})
-			.done(function(data) {
+			.then(function(data) {
 				return data.content;
 			});
 	}
 
 	self.getHeadlines = function(feedId) {
 		return api({op: 'getHeadlines', feed_id: feedId})
-			.done(function(data) {
+			.then(function(data) {
 				return data.content;
 			});
 	}
@@ -61,6 +61,7 @@ function TtRss(url) {
 		})
 		.then(function(data, textStatus, jqXHR) {
 			if (data.content.error) {
+        console.log("api error: " + data.content.error);
 				return Ember.$.Deferred().reject(jqXHR, data, data.content.error).promise();
 			} else {
 				return data;

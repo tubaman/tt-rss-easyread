@@ -1,30 +1,33 @@
 <html>
 	<head>
-		<title>tt-rss EasyRead</title>
+		<title>tt-rss EmberJS</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 		<link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen">
 		<link href="css/style.css" rel="stylesheet" media="screen">
 	</head>
 
-	<script type="html/login">
-	<div class="login">
-		<form role="form">
-			<div id="loginFail" class="alert alert-danger">User and password combo not found</div>
-			<div class="form-group">
-				<label for="user">User Name</label>
-				<input type="text" class="form-control" name="user" id="user" placeholder="enter your user name"/>
-			</div>
-			<div class="form-group">
-				<label for="password">Password</label>
-				<input type="password" class="form-control" name="password" id="password" placeholder="password"/>
-			</div>
-			<button id="login" type="submit" class="btn btn-default">Login</button>
-		</form>
-	</div>
-	</script>
-
 	<body>
+
+    <script type="text/x-handlebars" data-template-name="login">
+    <div class="login">
+      <form role="form" {{action login on="submit"}}>
+        {{#if errorMessage}}
+          <div id="loginFail" class="alert alert-danger">{{errorMessage}}</div>
+        {{/if}}
+        <div class="form-group">
+          <label for="user">User Name</label>
+          {{input type="text" class="form-control" name="user" id="user" value=user placeholder="enter your user name"}}
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          {{input type="password" class="form-control" name="password" id="password" value=password placeholder="password"}}
+        </div>
+        {{input id="login" type="submit" class="btn btn-default" value="Log In"}}
+      </form>
+    </div>
+    </script>
+
 
     <script type="text/x-handlebars">
 		<div class="navbar navbar-inverse navbar-fixed-top">
@@ -35,7 +38,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">tt-rss EasyRead</a>
+          <a class="navbar-brand" href="#">tt-rss EmberJS</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
