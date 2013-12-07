@@ -16,7 +16,6 @@ App.LoginRoute = Ember.Route.extend({
 App.AuthenticatedRoute = Ember.Route.extend({
   actions: {
     error: function(error, transition) {
-      console.log("error: " + error);
       if (error == 'NOT_LOGGED_IN') {
         var loginController = this.controllerFor('login');
         loginController.set('attemptedTransition', transition);
@@ -83,7 +82,6 @@ App.LoginController = Ember.Controller.extend({
     self.set('errorMessage', null);
     ttrss.login(this.get('user'), this.get('password')).then(
       function(sid) {
-        console.log('got a sid: ' + sid);
         self.set('sid', sid);
         var attemptedTransition = self.get('attemptedTransition');
         if (attemptedTransition) {
@@ -95,7 +93,6 @@ App.LoginController = Ember.Controller.extend({
       },
       function(error) {
         self.set('errorMessage', "User and password combo don't match");
-        console.log("error: " + JSON.stringify(error));
       });
   }
 });
@@ -116,7 +113,6 @@ App.Categories = Ember.ArrayProxy.create({
     var ttrss = new TtRss();
     content.clear();
     return ttrss.getCategories().then(function(categories) {
-      console.log("categories: " + JSON.stringify(categories));
       categories.forEach(function(data) {
         var category = App.Category.create();
         category.setProperties(data);
