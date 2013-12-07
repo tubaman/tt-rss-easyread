@@ -70,7 +70,7 @@
     <ul class="feeds list-group">
     {{#each feed in model.feeds}}
     <li class="list-group-item">
-      <span class="badge">{{unread}}</span>
+      <span class="badge">{{feed.unread}}</span>
       {{#linkTo 'headlines' feed}}{{feed.title}}{{/linkTo}}
     </li>
     {{/each}}
