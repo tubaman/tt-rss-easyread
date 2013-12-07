@@ -26,41 +26,96 @@ App.AuthenticatedRoute = Ember.Route.extend({
 });
 
 App.CategoriesRoute = App.AuthenticatedRoute.extend({
+  getCategories: function() {
+    console.log("getCategories");
+    if (App.Categories.get('length') == 0)
+    {
+      console.log("fetching");
+      return App.Categories.fetch();
+    } else {
+      return App.Categories;
+    }
+  },
+
   model: function() {
-    return App.Categories.fetch();
+    console.log("model");
+    return App.Categories;
+  },
+
+  afterModel: function(model, transition) {
+    console.log("afterModel");
+    return this.getCategories();
   }
+
 });
 
 App.FeedsRoute = App.AuthenticatedRoute.extend({
-  model: function(params) {
-    var category_id = parseInt(params.category_id);
-    var category = App.Category.create({id: category_id});
-    category.set("feeds", App.Feeds);
-    return App.Feeds.fetch(category_id).then(function(response) {
+
+  getFeeds: function(category) {
+    var self = this;
+    console.log("category id: " + category.get('id'));
+    console.log("currentCategoryId: " + self.get('currentCategoryId'));
+    console.log("feeds length: " + App.Feeds.get('length'));
+    if (category.get('id') != self.get('currentCategoryId') || App.Feeds.get('length') == 0)
+    {
+      return App.Feeds.fetch(category.get('id')).then(function(response) {
+        self.set('currentCategoryId', category.get('id'));
+        return category;
+      });
+    } else {
       return category;
-    });
+    }
   },
 
-  setupController: function(controller, context) {
-    App.Feeds.fetch(context.get("id"));
-    context.set("feeds", App.Feeds);
-    controller.set('model', context);
+  model: function(params) {
+    console.log("model");
+    var category_id = parseInt(params.category_id);
+    var category = App.Category.create({id: category_id});
+    return category;
+  },
+
+  afterModel: function(category, transition) {
+    console.log("afterModel category: " + category);
+    return this.getFeeds(category);
+  },
+ 
+  setupController: function(controller, category) {
+    console.log("setupController category: " + category);
+    category.set("feeds", App.Feeds);
+    controller.set('model', category);
   }
 
 });
 
 App.HeadlinesRoute = App.AuthenticatedRoute.extend({
+  getHeadlines: function(feed) {
+    var self = this;
+    console.log("feed id: " + feed.get('id'));
+    console.log("currentFeedId: " + self.get('currentFeedId'));
+    console.log("headlines length: " + App.Headlines.get('length'));
+    if (feed.get('id') != self.get('currentFeedId') || App.Headlines.get('length') == 0)
+    {
+      return App.Headlines.fetch(feed.get('id')).then(function(response) {
+        self.set('currentFeedId', feed.get('id'));
+        return feed;
+      });
+    } else {
+      return feed;
+    }
+  },
+
   model: function(params) {
     var feed_id = parseInt(params.feed_id);
     var feed = App.Feed.create({id: feed_id});
     feed.set("headlines", App.Headlines);
-    return App.Headlines.fetch(feed_id).then(function(response) {
-      return feed;
-    });
+    return feed;
+  },
+
+  afterModel: function(feed, transition) {
+    return this.getHeadlines(feed);
   },
 
   setupController: function(controller, context) {
-    App.Headlines.fetch(context.get("id"));
     context.set("headlines", App.Headlines);
     controller.set('model', context);
   }
@@ -105,11 +160,6 @@ App.Categories = Ember.ArrayProxy.create({
   fetch: function() {
     var self = this
     var content = self.get('content');
-    if (content.length != 0) {
-      return new Ember.RSVP.Promise(function(resolve) {
-        resolve(content);
-      });
-    }
     var ttrss = new TtRss();
     content.clear();
     return ttrss.getCategories().then(function(categories) {
@@ -132,11 +182,6 @@ App.Feeds = Ember.ArrayProxy.create({
   fetch: function(categoryId) {
     var content = this.get('content');
     var currentCategoryId = this.get('categoryId');
-    if (categoryId == currentCategoryId && content.length != 0) {
-      return new Ember.RSVP.Promise(function(resolve) {
-        resolve(content);
-      });
-    }
     var ttrss = new TtRss();
     this.set('categoryId', categoryId);
     content.clear();
@@ -159,11 +204,6 @@ App.Headlines = Ember.ArrayProxy.create({
   fetch: function(feedId) {
     var content = this.get('content');
     var currentFeedId = this.get('feedId');
-    if (currentFeedId == feedId && content.length != 0) {
-      return new Ember.RSVP.Promise(function(resolve) {
-        resolve(content);
-      });
-    }
     var ttrss = new TtRss();
     this.set('feedId', feedId);
     content.clear();
