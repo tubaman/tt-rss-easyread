@@ -8,7 +8,7 @@ App.Router.map(function() {
 });
 
 App.LoginRoute = Ember.Route.extend({
-  setupController: function(controller, context) {
+  setupController: function(controller, model) {
     controller.reset();
   }
 });
@@ -67,9 +67,9 @@ App.HeadlinesRoute = App.AuthenticatedRoute.extend({
     return App.Headlines.fetch(feed.get('id'));
   },
 
-  setupController: function(controller, context) {
-    context.set("headlines", App.Headlines);
-    controller.set('model', context);
+  setupController: function(controller, feed) {
+    feed.set("headlines", App.Headlines);
+    controller.set('model', feed);
   }
 });
 
