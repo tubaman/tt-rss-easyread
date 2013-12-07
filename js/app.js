@@ -132,7 +132,7 @@ App.Feeds = Ember.ArrayProxy.create({
   fetch: function(categoryId) {
     var content = this.get('content');
     var currentCategoryId = this.get('categoryId');
-    if (categoryId == currentCategoryId) {
+    if (categoryId == currentCategoryId && content.length != 0) {
       return new Ember.RSVP.Promise(function(resolve) {
         resolve(content);
       });
@@ -159,7 +159,7 @@ App.Headlines = Ember.ArrayProxy.create({
   fetch: function(feedId) {
     var content = this.get('content');
     var currentFeedId = this.get('feedId');
-    if (currentFeedId == feedId) {
+    if (currentFeedId == feedId && content.length != 0) {
       return new Ember.RSVP.Promise(function(resolve) {
         resolve(content);
       });
