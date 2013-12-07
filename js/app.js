@@ -27,10 +27,8 @@ App.AuthenticatedRoute = Ember.Route.extend({
 
 App.CategoriesRoute = App.AuthenticatedRoute.extend({
   getCategories: function() {
-    console.log("getCategories");
     if (App.Categories.get('length') == 0)
     {
-      console.log("fetching");
       return App.Categories.fetch();
     } else {
       return App.Categories;
@@ -38,12 +36,10 @@ App.CategoriesRoute = App.AuthenticatedRoute.extend({
   },
 
   model: function() {
-    console.log("model");
     return App.Categories;
   },
 
   afterModel: function(model, transition) {
-    console.log("afterModel");
     return this.getCategories();
   }
 
@@ -53,9 +49,6 @@ App.FeedsRoute = App.AuthenticatedRoute.extend({
 
   getFeeds: function(category) {
     var self = this;
-    console.log("category id: " + category.get('id'));
-    console.log("currentCategoryId: " + self.get('currentCategoryId'));
-    console.log("feeds length: " + App.Feeds.get('length'));
     if (category.get('id') != self.get('currentCategoryId') || App.Feeds.get('length') == 0)
     {
       return App.Feeds.fetch(category.get('id')).then(function(response) {
@@ -68,19 +61,16 @@ App.FeedsRoute = App.AuthenticatedRoute.extend({
   },
 
   model: function(params) {
-    console.log("model");
     var category_id = parseInt(params.category_id);
     var category = App.Category.create({id: category_id});
     return category;
   },
 
   afterModel: function(category, transition) {
-    console.log("afterModel category: " + category);
     return this.getFeeds(category);
   },
  
   setupController: function(controller, category) {
-    console.log("setupController category: " + category);
     category.set("feeds", App.Feeds);
     controller.set('model', category);
   }
@@ -90,9 +80,6 @@ App.FeedsRoute = App.AuthenticatedRoute.extend({
 App.HeadlinesRoute = App.AuthenticatedRoute.extend({
   getHeadlines: function(feed) {
     var self = this;
-    console.log("feed id: " + feed.get('id'));
-    console.log("currentFeedId: " + self.get('currentFeedId'));
-    console.log("headlines length: " + App.Headlines.get('length'));
     if (feed.get('id') != self.get('currentFeedId') || App.Headlines.get('length') == 0)
     {
       return App.Headlines.fetch(feed.get('id')).then(function(response) {
