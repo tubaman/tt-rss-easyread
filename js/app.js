@@ -108,6 +108,11 @@ App.Categories = Ember.ArrayProxy.create({
   fetch: function() {
     var self = this
     var content = self.get('content');
+    if (content.length != 0) {
+      return new Ember.RSVP.Promise(function(resolve) {
+        resolve(content);
+      });
+    }
     var ttrss = new TtRss();
     content.clear();
     return ttrss.getCategories().then(function(categories) {
@@ -126,10 +131,18 @@ App.Categories = Ember.ArrayProxy.create({
 App.Feed = Ember.Object.extend({});
 App.Feeds = Ember.ArrayProxy.create({
   content: [],
+  categoryId: null,
 
   fetch: function(categoryId) {
     var content = this.get('content');
+    var currentCategoryId = this.get('categoryId');
+    if (categoryId == currentCategoryId) {
+      return new Ember.RSVP.Promise(function(resolve) {
+        resolve(content);
+      });
+    }
     var ttrss = new TtRss();
+    this.set('categoryId', categoryId);
     content.clear();
     return ttrss.getFeeds(categoryId).then(function(feeds) {
       feeds.forEach(function(data) {
@@ -145,10 +158,18 @@ App.Feeds = Ember.ArrayProxy.create({
 App.Headline = Ember.Object.extend({});
 App.Headlines = Ember.ArrayProxy.create({
   content: [],
+  feedId: null,
 
   fetch: function(feedId) {
     var content = this.get('content');
+    var currentFeedId = this.get('feedId');
+    if (currentFeedId == feedId) {
+      return new Ember.RSVP.Promise(function(resolve) {
+        resolve(content);
+      });
+    }
     var ttrss = new TtRss();
+    this.set('feedId', feedId);
     content.clear();
     return ttrss.getHeadlines(feedId).then(function(headlines) {
       headlines.forEach(function(data) {
