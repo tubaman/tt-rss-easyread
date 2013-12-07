@@ -26,39 +26,17 @@ App.AuthenticatedRoute = Ember.Route.extend({
 });
 
 App.CategoriesRoute = App.AuthenticatedRoute.extend({
-  getCategories: function() {
-    if (App.Categories.get('length') == 0)
-    {
-      return App.Categories.fetch();
-    } else {
-      return App.Categories;
-    }
-  },
-
   model: function() {
     return App.Categories;
   },
 
   afterModel: function(model, transition) {
-    return this.getCategories();
+    return App.Categories.fetch();
   }
 
 });
 
 App.FeedsRoute = App.AuthenticatedRoute.extend({
-
-  getFeeds: function(category) {
-    var self = this;
-    if (category.get('id') != self.get('currentCategoryId') || App.Feeds.get('length') == 0)
-    {
-      return App.Feeds.fetch(category.get('id')).then(function(response) {
-        self.set('currentCategoryId', category.get('id'));
-        return category;
-      });
-    } else {
-      return category;
-    }
-  },
 
   model: function(params) {
     var category_id = parseInt(params.category_id);
@@ -67,7 +45,7 @@ App.FeedsRoute = App.AuthenticatedRoute.extend({
   },
 
   afterModel: function(category, transition) {
-    return this.getFeeds(category);
+    return App.Feeds.fetch(category.get('id'));
   },
  
   setupController: function(controller, category) {
@@ -78,28 +56,15 @@ App.FeedsRoute = App.AuthenticatedRoute.extend({
 });
 
 App.HeadlinesRoute = App.AuthenticatedRoute.extend({
-  getHeadlines: function(feed) {
-    var self = this;
-    if (feed.get('id') != self.get('currentFeedId') || App.Headlines.get('length') == 0)
-    {
-      return App.Headlines.fetch(feed.get('id')).then(function(response) {
-        self.set('currentFeedId', feed.get('id'));
-        return feed;
-      });
-    } else {
-      return feed;
-    }
-  },
 
   model: function(params) {
     var feed_id = parseInt(params.feed_id);
     var feed = App.Feed.create({id: feed_id});
-    feed.set("headlines", App.Headlines);
     return feed;
   },
 
   afterModel: function(feed, transition) {
-    return this.getHeadlines(feed);
+    return App.Headlines.fetch(feed.get('id'));
   },
 
   setupController: function(controller, context) {
@@ -148,6 +113,9 @@ App.Categories = Ember.ArrayProxy.create({
     var self = this
     var content = self.get('content');
     var ttrss = new TtRss();
+    if (App.Categories.get('length') != 0) {
+      return self;
+    }
     content.clear();
     return ttrss.getCategories().then(function(categories) {
       categories.forEach(function(data) {
@@ -164,13 +132,18 @@ App.Categories = Ember.ArrayProxy.create({
 App.Feed = Ember.Object.extend({});
 App.Feeds = Ember.ArrayProxy.create({
   content: [],
-  categoryId: null,
+  currentCategoryId: null,
 
   fetch: function(categoryId) {
+    var self = this;
     var content = this.get('content');
-    var currentCategoryId = this.get('categoryId');
     var ttrss = new TtRss();
-    this.set('categoryId', categoryId);
+
+    if (categoryId == self.get('currentCategoryId') && self.get('length') != 0)
+    { 
+      return self;
+    }
+
     content.clear();
     return ttrss.getFeeds(categoryId).then(function(feeds) {
       feeds.forEach(function(data) {
@@ -179,6 +152,7 @@ App.Feeds = Ember.ArrayProxy.create({
         feed.set("headlines", []);
         content.pushObject(feed);
       });
+      self.set('currentCategoryId', categoryId);
     });
   }
 });
@@ -186,13 +160,18 @@ App.Feeds = Ember.ArrayProxy.create({
 App.Headline = Ember.Object.extend({});
 App.Headlines = Ember.ArrayProxy.create({
   content: [],
-  feedId: null,
+  currentFeedId: null,
 
   fetch: function(feedId) {
+    var self = this;
     var content = this.get('content');
-    var currentFeedId = this.get('feedId');
     var ttrss = new TtRss();
-    this.set('feedId', feedId);
+
+    if (feedId == self.get('currentFeedId') && self.get('length') != 0)
+    {
+      return self;
+    }
+
     content.clear();
     return ttrss.getHeadlines(feedId).then(function(headlines) {
       headlines.forEach(function(data) {
@@ -200,6 +179,7 @@ App.Headlines = Ember.ArrayProxy.create({
         headline.setProperties(data);
         content.pushObject(headline);
       });
+      self.set('currentFeedId', feedId);
     });
   }
 });
