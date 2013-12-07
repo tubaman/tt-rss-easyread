@@ -34,9 +34,10 @@ App.CategoriesRoute = App.AuthenticatedRoute.extend({
 
 App.FeedsRoute = App.AuthenticatedRoute.extend({
   model: function(params) {
-    var category = App.Category.create({});
+    var category_id = parseInt(params.category_id);
+    var category = App.Category.create({id: category_id});
     category.set("feeds", App.Feeds);
-    return App.Feeds.fetch(params.category_id).then(function(response) {
+    return App.Feeds.fetch(category_id).then(function(response) {
       return category;
     });
   },
@@ -51,9 +52,10 @@ App.FeedsRoute = App.AuthenticatedRoute.extend({
 
 App.HeadlinesRoute = App.AuthenticatedRoute.extend({
   model: function(params) {
-    var feed = App.Feed.create({});
+    var feed_id = parseInt(params.feed_id);
+    var feed = App.Feed.create({id: feed_id});
     feed.set("headlines", App.Headlines);
-    return App.Headlines.fetch(params.feed_id).then(function(response) {
+    return App.Headlines.fetch(feed_id).then(function(response) {
       return feed;
     });
   },
